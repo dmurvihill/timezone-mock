@@ -132,7 +132,16 @@ device- and browser-dependant, so any use of these in tests may indicate a
 potential bug.
 
 With non-DST timezones, it should behave identically to the native Javascript
-Date object.  With DST timezones, it may sometimes behave slightly differently
-when given an ambiguous date string (e.g. "2014-11-02 01:00:00" in "US/Pacific",
-is treated as 1AM PDT instead of 1AM PST - same clock time, utc timestamp off by
-an hour).
+Date object for times and timestamps during Unix time. With DST
+timezones, it may sometimes behave slightly differently when given an
+ambiguous date string (e.g. "2014-11-02 01:00:00" in "US/Pacific", is
+treated as 1AM PDT instead of 1AM PST - same clock time, utc timestamp
+off by an hour).
+
+For very early dates (local astronomical year number -10,000 or earlier),
+the mock behavior diverges from Node. On these dates, Node switches from
+a UTC offset to Mean Local Solar Time in the time zone's principal city,
+if one exists (e.g. 'US/Pacific' changes its offset from -08:00 to
+-07:52, reflecting Mean Solar Time in Los Angeles at 118.24W longitude).
+This behavior is implementation-dependent `mock-timezone` does not
+imitate it.

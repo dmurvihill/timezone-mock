@@ -18,10 +18,10 @@ var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'O
 
 var HOUR = 60 * 60 * 1000;
 
-var date_iso_8601_regex = /^\d\d\d\d(-\d\d(-\d\d(T\d\d:\d\d(:\d\d)?(\.\d\d\d)?(\d\d\d)?(Z|[+-]\d\d:?\d\d))?)?)?$/;
-var date_with_offset = /^\d\d\d\d-\d\d-\d\d( \d\d:\d\d:\d\d(\.\d\d\d)? )?(Z|(-|\+|)\d\d:\d\d)$/;
+var date_iso_8601_regex = /^[+-]?\d\d\d\d\d?\d?(-\d\d(-\d\d(T\d\d:\d\d(:\d\d)?(\.\d\d\d)?(\d\d\d)?(Z|[+-]\d\d:?\d\d))?)?)?$/;
+var date_with_offset = /^[+-]?\d\d\d\d\d?\d?-\d\d-\d\d( \d\d:\d\d:\d\d(\.\d\d\d)? )?(Z|(-|\+|)\d\d:\d\d)$/;
 var date_rfc_2822_regex = /^\d\d-\w\w\w-\d\d\d\d \d\d:\d\d:\d\d (\+|-)\d\d\d\d$/;
-var local_date_regex = /^(\d\d\d\d)-(\d\d)-(\d\d)[T ](\d\d):(\d\d)(?::(\d\d)(?:\.(\d\d\d))?)?$/;
+var local_date_regex = /^([+-]?\d+)-(\d\d)-(\d\d)[T ](\d\d):(\d\d)(?::(\d\d)(?:\.(\d\d\d))?)?$/;
 var local_GMT_regex = /^(Mon|Tue|Wed|Thu|Fri|Sat|Sun), \d\d \w\w\w \d\d\d\d \d\d:\d\d:\d\d GMT$/;
 
 function MockDate(param) {
@@ -48,7 +48,13 @@ function MockDate(param) {
             return g !== undefined;
           })
           .map(function (n) {
-            return Number.parseInt(n, 10);
+            var numericDate = Number.parseInt(n, 10);
+            if (numericDate > -100000 && numericDate < 0) {
+              // I will never understand this, but the minus sign is
+              // ignored for timestamps of 5 digits or less.
+              return -1 * numericDate;
+            }
+            return numericDate;
           });
         segments[1]--; // Correct month to monthIndex
         this.d = new _Date();
