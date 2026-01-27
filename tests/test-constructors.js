@@ -284,3 +284,30 @@ test('chained mocking', function() {
   assert.equal(global.Date, MyDate);
   global.Date = RealDate;
 });
+
+var extremes = [
+  // timestamps
+  // local time strings
+  // offset strings
+].concat([
+  // local time components
+  // []
+]);
+
+
+// Mock doesn't work correctly in the first x or last y hours of the
+// range of valid Dates, even in non-DST time zones.
+['Etc/GMT+12', 'Etc/GMT-14'].forEach(function (tz) {
+  timezone_mock.register(tz);
+  try {
+    extremes.forEach(function (p) {
+      orig = new timezone_mock._Date();
+      timezone_mock._Date.apply(orig, p);
+      mock = new Date(p);
+      Date.apply(mock, p);
+      check('extreme parameters: ' + p);
+    });
+  } finally {
+    timezone_mock.unregister();
+  }
+});
